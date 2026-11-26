@@ -74,7 +74,7 @@ La causa era que la consulta inicial dependía del valor de `token`: volver a ab
 
 ### Estado OPSX
 
-La implementación y sus pruebas frontend están listas. Las tareas de backend/`bootJar` y Chromium quedan abiertas en [el change correctivo](../../c14-reapertura-enlace-misma-credencial/tasks.md); este seguimiento no se archiva hasta completar esas verificaciones en un entorno habilitado.
+En esa etapa la implementación y sus pruebas frontend estaban listas y quedaban abiertas las tareas de backend, `bootJar` y Chromium. El cierre posterior del seguimiento y la evidencia figuran en el [change correctivo archivado](../2026-11-26-c14-reapertura-enlace-misma-credencial/verification.md).
 
 ## Integración sobre `00cfec5` — 2026-11-25
 

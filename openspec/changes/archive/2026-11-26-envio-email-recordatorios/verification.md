@@ -14,7 +14,7 @@ Reloj de la campaña: 2027-01-05 10:00 UTC. Base aislada con datos ficticios.
 | Recordatorio | 00e8d727-a69d-4c35-a274-b23d6fed925e | ACEPTADA_SMTP | Recibido |
 | Combinado a 24 horas exactas | e78eb08a-57f4-4788-a715-813b23f3e513 | ACEPTADA_SMTP | Recibido |
 
-La campaña registró un solo intento para el despacho combinado, con tipos `CONFIRMACION+RECORDATORIO`. C-14 sigue pendiente, incluida la apertura funcional de los enlaces y la autogestión en navegador.
+La campaña registró un solo intento para el despacho combinado, con tipos `CONFIRMACION+RECORDATORIO`. En ese momento seguía pendiente la integración de C-14 y faltaba abrir los enlaces recibidos en navegador.
 
 ## Corrección de la ruta de autogestión
 
@@ -29,11 +29,11 @@ La ejecución directa en WSL usó Temurin 21.0.13.1+2, PostgreSQL 17.12 en un co
 | Regresión con la ruta anterior | `c11-ruta.KBnoGDYD` | 1 | `75389a339b588df831ce9d5eec878e81048768cb8b3431fb896ad6fc86d59ab6` |
 | Suite con la ruta corregida | `c11-ruta.ACYQdaGu` | 0 | `6f17500e98c7ee501dbf37975fbab064f41a10dd850c62a30e767b26ad41b1fd` |
 
-La comprobación de esta corrección cubre la composición. Una revisión independiente confirmó el alcance del diff, las huellas de ambos registros y que los dos archivos Java coinciden byte a byte con los de la ejecución exitosa. Las ejecuciones quedaron registradas con captura directa. El ejecutable Active Stack disponible carece de `evidence-capture` y `evidence-state`, por lo que sigue pendiente la corroboración formal de la procedencia de esas ejecuciones. **EM-04 y la tarea 4.1 siguen pendientes** hasta abrir el enlace desde un correo recibido en el buzón autorizado con C-14 integrado.
+La comprobación de esta corrección cubre la composición. Una revisión independiente confirmó el alcance del diff, las huellas de ambos registros y que los dos archivos Java coinciden byte a byte con los de la ejecución exitosa. Las ejecuciones quedaron registradas con captura directa. El ejecutable Active Stack disponible carece de `evidence-capture` y `evidence-state`, por lo que sigue pendiente la corroboración formal de la procedencia de esas ejecuciones. En esa revisión quedaron pendientes EM-04 y la tarea 4.1 por la apertura desde un mensaje recibido con C-14 integrado.
 
-## Pendientes de cierre
+## Estado anterior a la integración de C-14
 
-- Completar la apertura funcional y la autogestión en navegador cuando se integre C-14. El 2026-11-25 se consultó el remoto: el main de upstream y el HEAD de ignacio/c11 estaban en 4120042ce23782ab2d85ad75dab6e7a96cf754ce, con C-14 pendiente y sin la ruta de autogestión integrada. La tarea 4.1 y C-11 siguen abiertos por ese criterio.
+- El 2026-11-25 el main de upstream y el HEAD de `ignacio/c11` estaban en `4120042ce23782ab2d85ad75dab6e7a96cf754ce`. En ese momento, la integración de C-14 y la apertura funcional desde el mensaje seguían pendientes en la tarea 4.1.
 
 ## SMTP AUTH y revisión independiente
 
@@ -62,7 +62,7 @@ Se contrastaron AGENTS.md, CHANGES.md, los artefactos de C-11 y los contratos de
 
 La revisión independiente encontró que un fallo explícito al establecer conexión SMTP se trataba como incierto antes de enviar datos. La prueba reprodujo el fallo (recibo `c34125799b8fa4afab660ef1ed95b885`). Ahora `MailConnectException` se clasifica como transitorio y conserva los reintentos de C-05. Un timeout genérico sigue siendo incierto. El revisor dio su conformidad a la corrección y ejecutó en limpio `test integrationTest bootJar` con Temurin 21, PostgreSQL 17.12 aislado, filesystem POSIX y el emisor deshabilitado.
 
-Recibo independiente final `0cbf82d5a590a92353e52b0248c52498`, salida 0. Huella del árbol probado `9c788e20f64dd11d1dde2c86c3be763f1988e3122189afd632140d5f01cf8337`, previa a este registro documental. SHA-256 de salida redactada `3125227a32002264342b1eecaa634ee04a32771f8cce73160053a512d30d7312`. La prueba de corte y la comprobación manual de Gmail se mantienen como evidencia de sus respectivos escenarios. C-11 sigue abierto con 6/7 tareas.
+Recibo independiente final `0cbf82d5a590a92353e52b0248c52498`, salida 0. Huella del árbol probado `9c788e20f64dd11d1dde2c86c3be763f1988e3122189afd632140d5f01cf8337`, previa a este registro documental. SHA-256 de salida redactada `3125227a32002264342b1eecaa634ee04a32771f8cce73160053a512d30d7312`. La prueba de corte y la comprobación manual de Gmail se mantienen como evidencia de sus respectivos escenarios. Al finalizar esa revisión, C-11 tenía 6/7 tareas.
 
 ## Fallo conocido al recuperar el enlace antes de SMTP
 
@@ -84,4 +84,10 @@ Las ejecuciones Gradle usaron Temurin 21.0.13.1+2, PostgreSQL 17.12 descartable 
 
 Un agente distinto revisó el diff y contrastó las cuatro huellas de los archivos Java. Su dictamen fue favorable y señaló la dependencia del diagnóstico literal de C-04, cubierta por la regresión. La captura de las ejecuciones fue directa. El ejecutable Active Stack instalado no ofrece `evidence-state`, por lo que la corroboración formal de procedencia queda pendiente.
 
-Tras consultar ambos remotos, `upstream/main` quedó en `32c9128` con C-15 integrado y C-14 pendiente. La rama `ignacio/c11` quedó en `f434399` y diverge de upstream. **EM-04 y la tarea 4.1 quedan pendientes** hasta correlacionar y abrir un enlace desde una copia recibida en Gmail con C-14 integrada. En esta verificación no se enviaron correos externos.
+Tras consultar ambos remotos en esa revisión, `upstream/main` quedó en `32c9128` con C-15 integrado y C-14 pendiente. La rama `ignacio/c11` quedó en `f434399` y divergía de upstream. Faltaba correlacionar y abrir un enlace desde una copia recibida en Gmail con C-14 integrado. En esa verificación no se enviaron correos externos.
+
+## Cierre autorizado por Fernando
+
+El 2026-11-26 Fernando autorizó el cierre de C-11 con la evidencia local del JAR integrado y difirió la campaña de Gmail de la tarea 4.1 al archivo `CORRECCIONES.md`, en la carpeta padre del repositorio. El último intento de la campaña integrada se detuvo en la autenticación SMTP con `534 5.7.9`. Los mensajes de la campaña histórica de C-11 conservan su evidencia de recepción. La comprobación de EM-04 con el JAR integrado queda diferida, incluidos los cuatro tipos de aviso, la apertura desde Recibidos y el reloj controlado para el recordatorio.
+
+La repetición del cierre en `6c3d4fb` aprobó el build del JAR, las 125 unitarias y las 60 integraciones con PostgreSQL 17.12. También se comprobó la generación local del enlace y su reapertura a dos tamaños en Chromium con el transporte de prueba. [Evidencia de la entrega integrada](../2026-11-26-c14-reapertura-enlace-misma-credencial/verification.md).

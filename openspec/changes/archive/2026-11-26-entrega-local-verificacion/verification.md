@@ -4,7 +4,7 @@
 
 C-16 usa la excepción al contrato de evidencia que Fernando autorizó en D-04. Los resultados corresponden a Linux POSIX, Eclipse Temurin 21.0.13.1+2, Node.js 24.22.3, npm 12.2.3 y PostgreSQL 17.12 en un contenedor aislado con datos ficticios. Chromium ejecutó el JAR a 390×844 y 1440×900. La reproducción independiente usó otra copia y otra base.
 
-Las comprobaciones de Gmail se aplazaron por instrucción del usuario. C-11 4.1 y el seguimiento de C-14 permanecen abiertos. El transporte local del fixture ejercitó autorización, composición y registro de intentos con los servicios existentes. La recepción real en Gmail y la apertura desde el mensaje recibido conservan sus propios criterios de aceptación y quedan pendientes en C-16. La recepción histórica consta en `openspec/changes/envio-email-recordatorios/verification.md`.
+El 2026-11-26 Fernando autorizó archivar C-11 y el seguimiento de C-14 con la campaña integrada de Gmail diferida a `CORRECCIONES.md`, en la carpeta padre del repositorio. El transporte local de prueba ejercitó autorización, composición y registro de intentos. La recepción real y la apertura desde el mensaje del JAR conservan su estado diferido en la matriz. [Recepción histórica y cierre C-11](../2026-11-26-envio-email-recordatorios/verification.md) · [Cierre del seguimiento C-14](../2026-11-26-c14-reapertura-enlace-misma-credencial/verification.md).
 
 ## Requisitos del change
 
@@ -86,15 +86,15 @@ Las referencias de clases corresponden a las suites anteriores. Las referencias 
 | CA-US-009-03 | Comprobado | Navegador, conflicto y original intacto. GestionTurnoIntegrationTest, caso concurrente y rollback. |
 | CA-US-009-04 | Comprobado en suites | Regla de 24 horas compartida por las dos operaciones, con prueba directa de cancelación. GestionTurnoPage prueba específicamente reprogramación fuera de plazo, conservación del turno y contacto directo. Apertura de solo lectura comprobada en Chromium. |
 | CA-US-010-01 | Comprobado | PublicBookingIntegrationTest y fixture de composición C-11, intención ligada al turno. |
-| CA-US-010-02 | Pendiente | Apertura desde el mensaje real recibido en Gmail, C-11 4.1 y seguimiento C-14. |
+| CA-US-010-02 | Diferido | Recepción y apertura del mensaje de confirmación enviado por el JAR integrado. |
 | CA-US-010-03 | Comprobado | Navegador, confirmación inmediata y consulta por enlace ficticio. |
 | CA-US-010-04 | Comprobado | ColaDespachosIntegrationTest, RecuperacionIntencionesTest y aviso UI de estado pendiente. |
 | CA-US-011-01 | Comprobado | Navegador y GestionTurnoIntegrationTest, cancelación y reprogramación. |
-| CA-US-011-02 | Pendiente en C-16 | C-11 registró recepción histórica manual de ambos tipos. La campaña C-16 con mensajes reales queda diferida. |
+| CA-US-011-02 | Diferido en C-16 | C-11 registró recepción histórica manual de cancelación y reprogramación. Falta repetirla con el JAR integrado. |
 | CA-US-011-03 | Comprobado | GestionTurnoIntegrationTest, aviso e historial ligados a turno y destinatario. |
 | CA-US-011-04 | Comprobado | RecuperacionIntencionesTest y ColaDespachosIntegrationTest, vigencia y unicidad de intentos. |
 | CA-US-012-01 | Comprobado | RecuperacionIntencionesTest, recordatorio y combinación exacta a 24 horas con reloj fijo. |
-| CA-US-012-02 | Pendiente en C-16 | La recepción histórica de C-11 tiene su registro propio. Falta la comprobación en el buzón para esta entrega. |
+| CA-US-012-02 | Diferido en C-16 | Existe evidencia histórica de C-11. Falta repetir en el buzón la prueba del recordatorio de la entrega integrada. |
 | CA-US-012-03 | Comprobado | GestionTurnoIntegrationTest y RecuperacionIntencionesTest, reemplazo y supresión de obsoletos. |
 | CA-US-012-04 | Comprobado | Reinicio del JAR y ColaDespachosIntegrationTest y RecuperacionIntencionesTest, estados, reintentos y vencimiento. |
 
@@ -107,13 +107,13 @@ Las referencias de clases corresponden a las suites anteriores. Las referencias 
 | CA-VIS-03 | Comprobado | PostgreSQL real, dos reservas sincronizadas y un solo turno confirmado. |
 | CA-VIS-04 | Comprobado | Cancelación y reprogramación en Chromium. GestionTurnoIntegrationTest acredita avisos persistidos. |
 | CA-VIS-05 | Comprobado | Suites de Gestión con reloj fijo y el mensaje de contacto del frontend. |
-| CA-VIS-06 | Pendiente | Recepción y apertura desde Gmail en la entrega con el JAR. C-11 y C-14 siguen abiertos. |
+| CA-VIS-06 | Diferido | Recepción de los cuatro avisos y apertura de los enlaces aplicables desde Gmail con el JAR integrado. |
 | CA-VIS-07 | Comprobado | Reinicio del JAR y comparación de estado persistido con nueva sesión. |
 | CT-01 | Comprobado | PostgreSQL con carreras de reserva, configuración y reprogramación. |
 | CT-02 | Comprobado | HTTP del JAR sin sesión y suites de acceso interno y gestión por credencial. |
 | CT-03 | Comprobado | PublicAvailabilityIntegrationTest, PublicBookingIntegrationTest y GestionTurnoControllerTest. |
 | CT-04 | Comprobado | FL-09, igualdad de configuración, turnos y estado de notificaciones luego del reinicio. |
-| CT-05 | Parcial | JAR, PostgreSQL y navegación comprobados. Gmail difiere la aceptación completa. |
+| CT-05 | Parcial | JAR, PostgreSQL y navegación comprobados. La aceptación integrada por Gmail queda diferida. |
 | CT-06 | Comprobado | Matriz con evidencias y pendientes. Revisión independiente de ejecución y alcance. |
 | FL-01 | Comprobado | Ingreso, día, semana y detalle en ambos tamaños. |
 | FL-02 | Comprobado | Creación de motivo, horario semanal y pausa, alta y retiro de bloqueo. |

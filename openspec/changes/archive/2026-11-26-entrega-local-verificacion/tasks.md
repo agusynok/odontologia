@@ -20,5 +20,4 @@
 
 ## Workflow follow-up
 
-- Los checks 4.1 de C-11 y del seguimiento de C-14 se retoman en sus propios changes. Permanecen abiertos por decisión de Fernando.
-- Revisar el resultado de C-16 y los criterios pendientes antes de archivar con el CLI. Actualizar `CHANGES.md` después de verificar el estado de archivo.
+- C-16 quedó archivado con las verificaciones locales registradas. Fernando autorizó luego archivar C-11 y el seguimiento de C-14 con Gmail diferido. La campaña real se retoma con `CORRECCIONES.md` en la carpeta padre del repositorio y la [matriz de aceptación](verification.md) conserva su estado.

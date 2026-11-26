@@ -116,8 +116,9 @@ aplicación. El JAR sirve las pantallas y la API usando solamente Java y Postgre
 Detener Spring Boot con `Ctrl+C`. Para verificar persistencia, repetir el mismo
 comando sobre la misma base, volver a ingresar y consultar la configuración y el
 turno guardado. Conservar el volumen y la configuración local al reiniciar.
-El correo está deshabilitado en este recorrido. La comprobación desde el buzón
-Gmail autorizado queda pendiente en C-11 y en el seguimiento de C-14.
+El correo está deshabilitado en este recorrido. C-11 y el seguimiento de C-14
+están archivados. La comprobación integrada desde Gmail se difirió y figura en
+la [matriz de aceptación de C-16](openspec/changes/archive/2026-11-26-entrega-local-verificacion/verification.md).
 
 ## Iniciar PostgreSQL con Docker
 

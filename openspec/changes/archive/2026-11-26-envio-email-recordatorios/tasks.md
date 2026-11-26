@@ -17,4 +17,4 @@
 
 ## 4. Aceptación integrada
 
-- [ ] 4.1 Ejecutar build y las pruebas de regresión de C-04/C-05/C-09. Con autorización, comprobar los cuatro casos en los buzones de prueba, abrir los enlaces aplicables desde el equipo local y usar reloj controlado para el recordatorio. Registrar evidencia redactada correlacionada con el intento y distinguir la copia recibida tanto del resultado SMTP como del mensaje en Enviados. Registrar los recorridos pendientes para C-16.
+- [x] 4.1 Verificar el build y las regresiones de C-04/C-05/C-09 y registrar el estado de la aceptación integrada. Pasaron las comprobaciones locales con el JAR de entrega. Fernando autorizó el 2026-11-26 cerrar la tarea y diferir la comprobación de los cuatro avisos recibidos, la apertura de enlaces y el recordatorio con reloj controlado a `CORRECCIONES.md`, fuera del repositorio. [Registro de cierre](verification.md#cierre-autorizado-por-fernando).
