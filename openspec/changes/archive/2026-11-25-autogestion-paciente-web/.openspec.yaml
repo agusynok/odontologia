@@ -1,0 +1,4 @@
+schema: spec-driven
+created: 2026-11-25
+goal: Habilitar consulta, cancelación y reprogramación expresas en C-14 sin
+  cambiar el modelo de credenciales ni exceder su autorización

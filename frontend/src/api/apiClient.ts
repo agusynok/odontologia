@@ -6,8 +6,13 @@ import type {
   Bloqueo,
   BloqueoInput,
   CsrfResponse,
+  DisponibilidadGestionParams,
+  DisponibilidadGestionResponse,
   DisponibilidadPublicaParams,
   DisponibilidadPublicaResponse,
+  GestionTurnoActual,
+  GestionTurnoCambio,
+  GestionTurnoReprogramacion,
   HorarioResponse,
   Motivo,
   MotivoInput,
@@ -21,9 +26,13 @@ import {
   isBloqueo,
   isBloqueoList,
   isCsrfResponse,
+  isDisponibilidadGestionResponse,
   isDisponibilidadPublicaResponse,
   isErrorResponse,
   isHorarioResponse,
+  isGestionTurnoCambio,
+  isGestionTurnoReprogramacion,
+  isGestionTurno,
   isMotivo,
   isMotivoList,
   isReservaPublicaResponse,
@@ -52,6 +61,17 @@ export interface ApiClient {
     params: DisponibilidadPublicaParams,
   ) => Promise<ApiResult<DisponibilidadPublicaResponse>>;
   createPublicTurno: (input: ReservaPublicaInput) => Promise<ApiResult<ReservaPublicaResponse>>;
+  getGestionTurno: (token: string) => Promise<ApiResult<GestionTurnoActual>>;
+  getGestionDisponibilidad: (
+    token: string,
+    params?: DisponibilidadGestionParams,
+  ) => Promise<ApiResult<DisponibilidadGestionResponse>>;
+  cancelarGestionTurno: (token: string, etag: string) => Promise<ApiResult<GestionTurnoCambio>>;
+  reprogramarGestionTurno: (
+    token: string,
+    etag: string,
+    nuevoInicio: string,
+  ) => Promise<ApiResult<GestionTurnoReprogramacion>>;
   clearCsrfToken: () => void;
 }
 
@@ -228,6 +248,49 @@ export function createApiClient(fetchImpl: typeof fetch = fetch): ApiClient {
     return { ok: true, data: parsed.body };
   }
 
+  async function managedJson(
+    url: string,
+    token: string,
+    method: 'GET' | 'POST',
+    etag?: string,
+    payload?: unknown,
+  ): Promise<ApiResult<{ response: Response; body: unknown }>> {
+    const headers: Record<string, string> = { 'X-Management-Token': token };
+    const init: RequestInit = {
+      method,
+      credentials: 'same-origin',
+      cache: 'no-store',
+      headers,
+    };
+    if (etag !== undefined) {
+      headers['If-Match'] = etag;
+    }
+    if (payload !== undefined) {
+      headers['Content-Type'] = 'application/json';
+      init.body = JSON.stringify(payload);
+    }
+
+    let response: Response;
+    try {
+      response = await fetchImpl(url, init);
+    } catch {
+      return fail(0, 'NETWORK_ERROR');
+    }
+    if (!response.ok) {
+      return parseErrorResponse(response);
+    }
+    const parsed = await readJsonBody(response);
+    if (!parsed.ok) {
+      return fail(0, parsed.codigo);
+    }
+    return { ok: true, data: { response, body: parsed.body } };
+  }
+
+  function responseEtag(response: Response): string | null {
+    const value = response.headers.get('ETag');
+    return value !== null && value.trim().length > 0 ? value : null;
+  }
+
   return {
     clearCsrfToken,
     checkSession: () => getJson('/api/odontologo/sesion', isSessionResponse),
@@ -337,6 +400,67 @@ export function createApiClient(fetchImpl: typeof fetch = fetch): ApiClient {
         return fail(response.status, 'INVALID_RESPONSE');
       }
       return { ok: true, data: parsed.body };
+    },
+    getGestionTurno: async (token: string) => {
+      const result = await managedJson('/api/gestion/turno', token, 'GET');
+      if (!result.ok) {
+        return result;
+      }
+      const etag = responseEtag(result.data.response);
+      if (etag === null || !isGestionTurno(result.data.body)) {
+        return fail(result.data.response.status, 'INVALID_RESPONSE');
+      }
+      return { ok: true, data: { turno: result.data.body, etag } };
+    },
+    getGestionDisponibilidad: async (token: string, params: DisponibilidadGestionParams = {}) => {
+      const search = new URLSearchParams();
+      if (typeof params.desde === 'string' && params.desde.trim().length > 0) {
+        search.set('desde', params.desde.trim());
+      }
+      if (typeof params.hasta === 'string' && params.hasta.trim().length > 0) {
+        search.set('hasta', params.hasta.trim());
+      }
+      const query = search.toString();
+      const url = `/api/gestion/turno/disponibilidad${query.length > 0 ? `?${query}` : ''}`;
+      const result = await managedJson(url, token, 'GET');
+      if (!result.ok) {
+        return result;
+      }
+      if (!isDisponibilidadGestionResponse(result.data.body)) {
+        return fail(result.data.response.status, 'INVALID_RESPONSE');
+      }
+      return { ok: true, data: result.data.body };
+    },
+    cancelarGestionTurno: async (token: string, etag: string) => {
+      const result = await managedJson('/api/gestion/turno/cancelacion', token, 'POST', etag);
+      if (!result.ok) {
+        return result;
+      }
+      if (!isGestionTurnoCambio(result.data.body) || result.data.body.estado !== 'CANCELADO') {
+        return fail(result.data.response.status, 'INVALID_RESPONSE');
+      }
+      return { ok: true, data: result.data.body };
+    },
+    reprogramarGestionTurno: async (token: string, etag: string, nuevoInicio: string) => {
+      const result = await managedJson(
+        '/api/gestion/turno/reprogramacion',
+        token,
+        'POST',
+        etag,
+        { nuevoInicio },
+      );
+      if (!result.ok) {
+        return result;
+      }
+      const responseEtagValue = responseEtag(result.data.response);
+      if (
+        responseEtagValue === null ||
+        !isGestionTurnoReprogramacion(result.data.body) ||
+        result.data.body.estado !== 'CONFIRMADO'
+      ) {
+        return fail(result.data.response.status, 'INVALID_RESPONSE');
+      }
+      return { ok: true, data: { ...result.data.body, etag: responseEtagValue } };
     },
   };
 }

@@ -12,12 +12,20 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-@RestControllerAdvice(assignableTypes = GestionTurnoController.class)
+@RestControllerAdvice(assignableTypes = {GestionTurnoController.class, GestionTurnoDisponibilidadController.class})
 public final class GestionTurnoErrorAdvice {
 
     @ExceptionHandler(GestionTurnoException.class)
     public ResponseEntity<ErrorResponse> gestion(GestionTurnoException failure) {
         return response(failure.status(), failure.codigo().name());
+    }
+
+    @ExceptionHandler(AvailabilityException.class)
+    public ResponseEntity<ErrorResponse> disponibilidad(AvailabilityException failure) {
+        if (failure.status() == HttpStatus.BAD_REQUEST && "VALIDATION_ERROR".equals(failure.codigo())) {
+            return response(failure.status(), failure.codigo());
+        }
+        return response(HttpStatus.INTERNAL_SERVER_ERROR, "TECHNICAL_FAILURE");
     }
 
     @ExceptionHandler(AgendaWriteException.class)

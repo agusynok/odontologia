@@ -7,6 +7,7 @@ import { HorarioSection } from './components/HorarioSection';
 import { LoginForm } from './components/LoginForm';
 import { MotivosSection } from './components/MotivosSection';
 import { PublicBookingPage } from './components/PublicBookingPage';
+import { GestionTurnoPage } from './components/GestionTurnoPage';
 
 export type SectionTab = 'agenda' | 'motivos' | 'horario' | 'bloqueos';
 type AuthState = 'checking' | 'unauthenticated' | 'authenticated';
@@ -21,12 +22,20 @@ function isPublicBookingPath(pathname: string): boolean {
   return pathname === '/reservar' || pathname.startsWith('/reservar/');
 }
 
+function isManagementPath(pathname: string): boolean {
+  return pathname === '/gestionar-turno' || pathname.startsWith('/gestionar-turno/');
+}
+
+function isPublicPath(pathname: string): boolean {
+  return isPublicBookingPath(pathname) || isManagementPath(pathname);
+}
+
 export function App({ client = defaultApiClient, initialPath, initialTab }: AppProps) {
   const [currentPath, setCurrentPath] = useState<string>(
     () => initialPath ?? window.location.pathname,
   );
   const [authState, setAuthState] = useState<AuthState>(() =>
-    isPublicBookingPath(initialPath ?? window.location.pathname) ? 'unauthenticated' : 'checking',
+    isPublicPath(initialPath ?? window.location.pathname) ? 'unauthenticated' : 'checking',
   );
   const [authNotice, setAuthNotice] = useState<string | null>(null);
   const [logoutError, setLogoutError] = useState<string | null>(null);
@@ -35,13 +44,14 @@ export function App({ client = defaultApiClient, initialPath, initialTab }: AppP
   const [loggingOut, setLoggingOut] = useState(false);
 
   const isBookingRoute = isPublicBookingPath(currentPath);
+  const isManagementRoute = isManagementPath(currentPath);
 
   const navigateTo = useCallback((nextPath: string) => {
     if (window.location.pathname !== nextPath) {
       window.history.pushState(null, '', nextPath);
     }
     setCurrentPath(nextPath);
-    if (!isPublicBookingPath(nextPath)) {
+    if (!isPublicPath(nextPath)) {
       setAuthState('checking');
     }
   }, []);
@@ -50,7 +60,7 @@ export function App({ client = defaultApiClient, initialPath, initialTab }: AppP
     function handlePopState(): void {
       const next = window.location.pathname;
       setCurrentPath(next);
-      if (!isPublicBookingPath(next)) {
+      if (!isPublicPath(next)) {
         setAuthState('checking');
       }
     }
@@ -72,7 +82,7 @@ export function App({ client = defaultApiClient, initialPath, initialTab }: AppP
   );
 
   useEffect(() => {
-    if (isBookingRoute) {
+    if (isBookingRoute || isManagementRoute) {
       return;
     }
     let active = true;
@@ -92,7 +102,7 @@ export function App({ client = defaultApiClient, initialPath, initialTab }: AppP
     return () => {
       active = false;
     };
-  }, [client, isBookingRoute]);
+  }, [client, isBookingRoute, isManagementRoute]);
 
   async function handleLogout(): Promise<void> {
     setLoggingOut(true);
@@ -115,7 +125,9 @@ export function App({ client = defaultApiClient, initialPath, initialTab }: AppP
   return (
     <div className="app-shell">
       <main className="app-container">
-        {isBookingRoute ? (
+        {isManagementRoute ? (
+          <GestionTurnoPage apiClient={client} />
+        ) : isBookingRoute ? (
           <PublicBookingPage apiClient={client} onGoToDentist={() => navigateTo('/')} />
         ) : (
           <>

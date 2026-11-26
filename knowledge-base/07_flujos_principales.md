@@ -114,7 +114,7 @@ Los identificadores `FL-NN` permiten citar flujos. Las referencias US y CT perte
 4. Registra el origen del aviso de cambio y coordina los recordatorios anteriores según PB-11. La interfaz informa el resultado y el correo se procesa mediante FL-08.
 
 **Resultado**: cancelación persistida, horario liberado y aviso de cambio originado.
-**Casos de error**: credencial no válida → no ejecutar; fuera de plazo → impedir autogestión y prever contacto con el odontólogo; turno ya cancelado o cambio simultáneo → PB-08; fallas de correo → PB-10, sin derivar una transición de turno adicional. Conservación y eliminación siguen en PB-12.
+**Casos de error**: credencial no válida → no ejecutar; fuera de plazo → impedir autogestión e indicar contacto directo con el odontólogo por el canal habitual externo del consultorio; no hay alta manual ni excepción desde la app. Turno ya cancelado o cambio simultáneo → PB-08; fallas de correo → PB-10, sin derivar una transición de turno adicional. Conservación y eliminación siguen en PB-12.
 **Referencias**: US-008, US-011; RN-AU-02, RN-AU-04, RN-AU-05, RN-CA-01, RN-CA-02, RN-CA-03, RN-NO-01, RN-NO-04; PB-01, PB-06, PB-07, PB-08, PB-10, PB-11 y PB-12.
 
 ## FL-07 — Reprogramar sin perder el turno original ante fallo
@@ -132,7 +132,7 @@ Los identificadores `FL-NN` permiten citar flujos. Las referencias US y CT perte
 5. Origina el aviso de cambio, coordina los recordatorios para la revisión vigente y devuelve el resultado. El efecto sobre credenciales anteriores se definirá en PB-07; el envío sigue FL-08.
 
 **Resultado**: el mismo turno confirmado ocupa el nuevo intervalo; si el cambio falla, la reserva original permanece.
-**Casos de error**: nuevo horario ocupado, fuera de disponibilidad o fuera de ventana → rechazar el cambio sin perder la reserva; fuera del plazo de autogestión → prever contacto con el odontólogo; repetición o cambios simultáneos del mismo turno → PB-08; fallo de correo tras el cambio → PB-10. El mecanismo transaccional concreto se diseñará en arquitectura.
+**Casos de error**: nuevo horario ocupado, fuera de disponibilidad o fuera de ventana → rechazar el cambio sin perder la reserva; fuera del plazo de autogestión → mantener el rechazo e indicar contacto directo con el odontólogo por el canal habitual externo del consultorio, sin alta manual ni excepción; repetición o cambios simultáneos del mismo turno → PB-08; fallo de correo tras el cambio → PB-10. El mecanismo transaccional concreto se diseñará en arquitectura.
 **Referencias**: US-009, US-011, CT-01; RN-AG-03, RN-AG-05, RN-RE-01, RN-AU-02, RN-AU-04, RN-AU-05, RN-RP-01, RN-RP-02, RN-RP-03, RN-RP-04, RN-RP-05, RN-EX-01; PB-01, PB-02, PB-03, PB-05, PB-06, PB-07, PB-08, PB-10 y PB-11.
 
 ```mermaid
@@ -200,7 +200,7 @@ El diagrama muestra la rama con acceso y reglas válidos; sus rechazos se descri
 | Límites, zona, franjas y paso de horarios. | PB-01, PB-02, PB-03. | Disponibilidad, reserva, plazo de autogestión y recordatorios. |
 | Identificación y corrección de pacientes. | PB-04. | Registro o reutilización de paciente y destinatarios de avisos. |
 | Cambios de configuración con reservas existentes. | PB-05. | Configuración, disponibilidad y duración al reprogramar. |
-| Gestión manual y contacto fuera de plazo. | PB-06. | No se agrega un flujo de excepción manual todavía no definido. |
+| Gestión manual y contacto fuera de plazo. | PB-06. | El odontólogo atiende el contacto directo fuera de la app por el canal habitual del consultorio; no se agrega un flujo de excepción manual. |
 | Acceso por enlace y operaciones repetidas. | PB-07, PB-08. | Consulta privada, invalidación, recuperación y cambios simultáneos. |
 | Coincidencia a 24 horas y fallas de comunicaciones. | PB-09, PB-10, PB-11. | Preparación, envío, reintentos, avisos obsoletos y recuperación tras reinicios. |
 | Conservación y recuperación de datos. | PB-12. | No se infiere borrado ni procedimiento de restauración. |

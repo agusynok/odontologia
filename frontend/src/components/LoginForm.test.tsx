@@ -22,6 +22,10 @@ function makeClient(overrides: Partial<ApiClient> = {}): ApiClient {
     getPublicMotivos: vi.fn(),
     getPublicDisponibilidad: vi.fn(),
     createPublicTurno: vi.fn(),
+    getGestionTurno: vi.fn(),
+    getGestionDisponibilidad: vi.fn(),
+    cancelarGestionTurno: vi.fn(),
+    reprogramarGestionTurno: vi.fn(),
     clearCsrfToken: vi.fn(),
     ...overrides,
   };

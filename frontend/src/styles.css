@@ -255,6 +255,91 @@ button:focus-visible {
   margin-top: 0;
 }
 
+.management-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.management-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.management-header > div {
+  min-width: 0;
+}
+
+.management-turn h2 {
+  margin-bottom: 0.75rem;
+}
+
+.management-turn dl {
+  margin: 0 0 0.8rem;
+}
+
+.management-turn dt {
+  color: #4b5563;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.management-turn dd {
+  margin: 0.15rem 0 0;
+  font-weight: 600;
+}
+
+.management-period-action {
+  align-self: end;
+}
+
+.management-slots {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.management-slots legend {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.management-slot-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: 0.6rem;
+}
+
+.management-slot {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  min-width: 0;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #b8c4d0;
+  border-radius: 6px;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.management-slot input {
+  width: auto;
+  min-width: auto;
+  margin: 0.25rem 0 0;
+  accent-color: #1d4ed8;
+}
+
+.management-slot-selected {
+  border-color: #1d4ed8;
+  background: #eff6ff;
+}
+
 .item-list {
   list-style: none;
   margin: 0;

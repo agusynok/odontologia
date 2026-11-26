@@ -430,4 +430,113 @@ describe('apiClient', () => {
       expect(errNet.codigo).toBe('NETWORK_ERROR');
     }
   });
+
+  it('consulta varias veces el turno y la disponibilidad protegida sin motivoId ni cache', async () => {
+    const token = 'private-management-token';
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(new Response(JSON.stringify({
+        fecha: '2030-01-08',
+        horaInicio: '09:00:00',
+        horaFin: '09:30:00',
+        estado: 'CONFIRMADO',
+        acciones: ['CANCELAR', 'REPROGRAMAR'],
+      }), { status: 200, headers: { ETag: '"turno-r1"' } }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({
+        fecha: '2030-01-10',
+        horaInicio: '09:00:00',
+        horaFin: '09:30:00',
+        estado: 'CONFIRMADO',
+        acciones: ['CANCELAR', 'REPROGRAMAR'],
+      }), { status: 200, headers: { ETag: '"turno-r2"' } }))
+      .mockResolvedValueOnce(jsonResponse(200, {
+        zonaHoraria: 'America/Argentina/Mendoza',
+        horarios: [{ inicio: '2030-01-09T12:00:00Z', fin: '2030-01-09T12:30:00Z' }],
+      }));
+
+    const client = createApiClient(fetchMock);
+    const appointment = await client.getGestionTurno(token);
+    const repeatedAppointment = await client.getGestionTurno(token);
+    const availability = await client.getGestionDisponibilidad(token, {
+      desde: '2030-01-09',
+      hasta: '2030-01-20',
+    });
+
+    expect(appointment.ok).toBe(true);
+    if (appointment.ok) {
+      expect(appointment.data.etag).toBe('"turno-r1"');
+      expect(appointment.data.turno.estado).toBe('CONFIRMADO');
+    }
+    expect(repeatedAppointment).toMatchObject({
+      ok: true,
+      data: { turno: { fecha: '2030-01-10' }, etag: '"turno-r2"' },
+    });
+    expect(fetchMock.mock.calls[0]?.[0]).toBe('/api/gestion/turno');
+    expect(fetchMock.mock.calls[1]?.[0]).toBe('/api/gestion/turno');
+    expect(fetchMock.mock.calls[2]?.[0]).toBe(
+      '/api/gestion/turno/disponibilidad?desde=2030-01-09&hasta=2030-01-20',
+    );
+    for (const [, init] of fetchMock.mock.calls) {
+      const headers = new Headers(init?.headers);
+      expect(headers.get('X-Management-Token')).toBe(token);
+      expect(init?.credentials).toBe('same-origin');
+      expect(init?.cache).toBe('no-store');
+      expect(String(init?.body ?? '')).not.toContain('motivoId');
+    }
+    expect(availability.ok).toBe(true);
+  });
+
+  it('envia If-Match en cancelacion y reprogramacion y conserva el inicio exacto', async () => {
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(jsonResponse(200, {
+        fecha: '2030-01-08',
+        horaInicio: '09:00:00',
+        horaFin: '09:30:00',
+        estado: 'CANCELADO',
+        notificacionEstado: 'PENDIENTE',
+      }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({
+        turnoId: '22222222-2222-2222-2222-222222222222',
+        fecha: '2030-01-09',
+        horaInicio: '09:00:00',
+        horaFin: '09:30:00',
+        estado: 'CONFIRMADO',
+        notificacionEstado: 'PENDIENTE',
+      }), { status: 200, headers: { ETag: '"turno-r2"' } }));
+
+    const client = createApiClient(fetchMock);
+    const cancelled = await client.cancelarGestionTurno('secret-a', '"turno-r1"');
+    const newStart = '2030-01-09T12:00:00Z';
+    const rescheduled = await client.reprogramarGestionTurno('secret-b', '"turno-r2"', newStart);
+
+    expect(cancelled.ok).toBe(true);
+    expect(rescheduled.ok).toBe(true);
+    if (rescheduled.ok) {
+      expect(rescheduled.data.etag).toBe('"turno-r2"');
+    }
+    expect(fetchMock.mock.calls[0]?.[0]).toBe('/api/gestion/turno/cancelacion');
+    expect(fetchMock.mock.calls[1]?.[0]).toBe('/api/gestion/turno/reprogramacion');
+    const cancelInit = fetchMock.mock.calls[0]?.[1];
+    const rescheduleInit = fetchMock.mock.calls[1]?.[1];
+    expect(new Headers(cancelInit?.headers).get('If-Match')).toBe('"turno-r1"');
+    expect(new Headers(cancelInit?.headers).get('X-Management-Token')).toBe('secret-a');
+    expect(new Headers(rescheduleInit?.headers).get('If-Match')).toBe('"turno-r2"');
+    expect(new Headers(rescheduleInit?.headers).get('X-Management-Token')).toBe('secret-b');
+    expect(rescheduleInit?.body).toBe(JSON.stringify({ nuevoInicio: newStart }));
+  });
+
+  it('reconoce los errores de enlace y de gestion de C-09', async () => {
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(jsonResponse(404, { codigo: 'LINK_NOT_AVAILABLE' }))
+      .mockResolvedValueOnce(jsonResponse(409, { codigo: 'MANAGEMENT_WINDOW_CLOSED' }));
+    const client = createApiClient(fetchMock);
+
+    const missing = await client.getGestionTurno('secret');
+    const closed = await client.cancelarGestionTurno('secret', '"turno-r1"');
+
+    expect(missing).toMatchObject({ ok: false, status: 404, codigo: 'LINK_NOT_AVAILABLE' });
+    expect(closed).toMatchObject({ ok: false, status: 409, codigo: 'MANAGEMENT_WINDOW_CLOSED' });
+  });
 });
