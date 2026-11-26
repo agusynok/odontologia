@@ -21,7 +21,7 @@
 - **Decisión posterior del usuario, 2026-11-19:** saltear diseño visual e ir al roadmap. Política `off`, persistida en [design-system/README.md](design-system/README.md) y en el estado de fundación. AT-11 queda resuelto respecto de esa política; no bloquea las pantallas. Se omiten sistema visual y revisión obligatoria de mockups. AP-01, nombre comercial, permanece pendiente; usar el identificador provisional `odontologia` sin crear una marca.
 - No se incluyen clínica, pagos, suscripciones, WhatsApp, recepción, múltiples consultorios, despliegue público, auditoría completa ni procedimientos de backup/restore. PB-12 y AT-09 deben resolverse antes de usar datos reales; la prueba de reinicio de esta entrega no equivale a restaurar un respaldo.
 - La semana es un objetivo sin fechas ni capacidad acordadas (AP-03). Este orden no promete terminar en siete días ni demuestra viabilidad del plazo. AP-04 y SU-01/SU-04/SU-05 siguen pendientes de validación con personas; una demostración técnica no acredita demanda ni reducción de trabajo. AP-02, AP-05 y AP-06 se mantienen fuera de este plan de MVP.
-- Los changes C-01 a C-10, C-12, C-13 y C-15 están implementados, verificados y archivados (incluidos sus seguimientos). C-09 tiene registrada la aprobación CRITICAL de Fernando para el uso interno del email confirmado de recuperación al preparar avisos futuros. La disputa de AG-05 por el mismo horario tiene prueba de integración PostgreSQL. C-11 conserva pendiente la apertura funcional del enlace desde el correo recibido; C-14 tiene sus dependencias completas.
+- Los changes C-01 a C-10 y C-12 a C-16 tienen archivada su implementación base. C-16 comprobó el JAR de entrega, los recorridos locales y el reinicio. La apertura desde Gmail sigue pendiente en C-11 y en el seguimiento correctivo de C-14, con su impacto en la matriz de aceptación de C-16. C-09 tiene registrada la aprobación CRITICAL de Fernando para el uso interno del email confirmado de recuperación al preparar avisos futuros. La disputa de AG-05 por el mismo horario tiene prueba de integración PostgreSQL.
 
 ### Gobernanza aplicable
 
@@ -489,7 +489,7 @@ Un solo agente puede seguir el orden topológico del cuadro de dependencias; la 
 
 ### [C-16] `entrega-local-verificacion`
 
-- **Estado**: `[ ]` pendiente.
+- **Estado**: `[x]` implementado y archivado el 2026-11-26, con 9/9 tareas. El JAR integrado, las regresiones con PostgreSQL 17.12, los recorridos Chromium y el reinicio cuentan con reproducción independiente bajo la excepción aprobada por Fernando. La evidencia pendiente de Gmail se conserva en C-11 y el seguimiento de C-14. [Matriz y verificación de C-16](openspec/changes/archive/2026-11-26-entrega-local-verificacion/verification.md).
 - **Scope**:
   - Completar integración reproducible del build frontend/backend conforme a PT-05 revisada: servir React compilado y sus rutas desde Spring Boot sin servidor Node.js para la demostración; documentar comandos reales, requisitos, variables sin secretos y pasos de inicio/detención.
   - Recorrer FL-01 a FL-09 desde un entorno limpio de prueba y después de reiniciar sobre los datos persistidos, sin recrear consultorio/configuración/pacientes/turnos/avisos. Verificar CT-04/CT-05 y CA-VIS-07; no ejecutar restauraciones ni añadir backup como requisito.

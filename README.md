@@ -1,8 +1,8 @@
 # odontologia
 
-Aplicación local para la agenda de un odontólogo independiente. C-01 prepara el
-entorno de desarrollo: todavía no hay pantallas, endpoints de negocio, tablas de
-dominio ni envío de correo. El nombre del repositorio es provisional.
+Aplicación local para la agenda de un odontólogo independiente. Incluye acceso
+interno, configuración de disponibilidad, reserva y autogestión de turnos. El
+nombre del repositorio es provisional. Usar datos ficticios en la demostración.
 
 ## Herramientas
 
@@ -71,6 +71,53 @@ builds posteriores pueden reutilizar las cachés locales.
 actualización deliberada se hace con `./gradlew resolveAndLockAll --write-locks`;
 para el frontend, con la versión fijada de npm y `install`. Revisar y compartir
 los cambios de los bloqueos. No usar estos comandos para instalar rutinariamente.
+
+## Construir y ejecutar el JAR de la demostración
+
+Desde la raíz, con Java, Node.js y npm seleccionados según la tabla de herramientas:
+
+```bash
+./backend/gradlew -p backend bootJar -PentregaLocal
+```
+
+Este modo instala las dependencias web con `npm ci`, ejecuta `npm run build` y
+empaqueta React en `backend/build/libs/odontologia-0.0.1-SNAPSHOT-local.jar`.
+Usar el JAR de una ejecución que termine con `BUILD SUCCESSFUL`. PostgreSQL se
+requiere al ejecutar la aplicación. `bootJar` sin `-PentregaLocal` sigue siendo
+el build independiente del backend y Vite sigue disponible para desarrollo.
+
+Para iniciar la demostración, [poner en marcha PostgreSQL](#iniciar-postgresql-con-docker),
+[habilitar el acceso interno](#habilitar-el-acceso-interno-del-odontólogo) y
+[configurar las claves de gestión](#configurar-las-claves-de-los-enlaces-de-gestión).
+Mantener los dos archivos privados fuera del checkout y exportar sus rutas con
+`APP_DENTIST_CREDENTIAL_FILE` y `APP_GESTION_KEY_FILE`. Desde la raíz:
+
+```bash
+export SERVER_ADDRESS=127.0.0.1 SERVER_PORT=8080
+export APP_BASE_URL=http://127.0.0.1:8080
+export APP_TIME_ZONE=America/Argentina/Mendoza
+export APP_CONSULTORIO_NOMBRE=Grupo13
+export APP_ODONTOLOGO_NOMBRE='Carlos Garcia'
+export APP_MAIL_ENABLED=false
+python3 scripts/with-local-db.py java -jar backend/build/libs/odontologia-0.0.1-SNAPSHOT-local.jar
+```
+
+Para [otra instancia local](#configurar-otra-instancia-local), exportar las tres
+variables JDBC de esa sección y ejecutar directamente el `java -jar` anterior.
+En una base ya inicializada, usar los nombres y la zona que se guardaron al
+crearla. La URL base de esta demostración es la de Spring Boot en el puerto 8080.
+En desarrollo con Vite se mantiene el origen del puerto 5173.
+
+Abrir `http://127.0.0.1:8080/` para ingresar a la agenda o
+`http://127.0.0.1:8080/reservar` para reservar. Los enlaces de autogestión abren
+`/gestionar-turno` en el mismo origen y funcionan en el equipo donde corre la
+aplicación. El JAR sirve las pantallas y la API usando solamente Java y PostgreSQL.
+
+Detener Spring Boot con `Ctrl+C`. Para verificar persistencia, repetir el mismo
+comando sobre la misma base, volver a ingresar y consultar la configuración y el
+turno guardado. Conservar el volumen y la configuración local al reiniciar.
+El correo está deshabilitado en este recorrido. La comprobación desde el buzón
+Gmail autorizado queda pendiente en C-11 y en el seguimiento de C-14.
 
 ## Iniciar PostgreSQL con Docker
 
@@ -170,9 +217,9 @@ mediante sus variables.
 
 Desde `backend/`, `./gradlew bootRun` inicia Spring Boot en `127.0.0.1:8080`.
 Desde otra terminal, en `frontend/`, `npx --yes npm@12.2.3 run dev` inicia Vite en
-`127.0.0.1:5173`. Abrir `http://127.0.0.1:5173`: la entrada está vacía hasta los
-changes de pantallas. Cada proceso se detiene con Ctrl+C. Si un puerto está ocupado,
-el servidor correspondiente falla sin elegir otro.
+`127.0.0.1:5173`. Abrir `http://127.0.0.1:5173` para acceder a la aplicación
+en modo desarrollo. Cada proceso se detiene con Ctrl+C. Si un puerto está
+ocupado, el servidor correspondiente informa el conflicto.
 
 Vite reenvía `/api` a `http://127.0.0.1:8080` sin cambiar la ruta. En C-01,
 `curl -i http://127.0.0.1:5173/api/c01-probe` debe conservar el 404 del backend;

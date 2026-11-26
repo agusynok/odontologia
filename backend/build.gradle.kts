@@ -46,6 +46,34 @@ tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 
+if (providers.gradleProperty("entregaLocal").isPresent) {
+    val frontendDirectory = layout.projectDirectory.dir("../frontend")
+    val npm = if (System.getProperty("os.name").startsWith("Windows", ignoreCase = true)) {
+        listOf("cmd.exe", "/d", "/c", "npx.cmd", "--yes", "npm@12.2.3")
+    } else {
+        listOf("npx", "--yes", "npm@12.2.3")
+    }
+
+    val installFrontend = tasks.register<Exec>("installDeliveryFrontend") {
+        workingDir(frontendDirectory.asFile)
+        commandLine(npm + "ci")
+    }
+
+    val buildFrontend = tasks.register<Exec>("buildDeliveryFrontend") {
+        dependsOn(installFrontend)
+        workingDir(frontendDirectory.asFile)
+        commandLine(npm + listOf("run", "build"))
+    }
+
+    tasks.bootJar {
+        dependsOn(buildFrontend)
+        archiveClassifier.set("local")
+        from(frontendDirectory.dir("dist")) {
+            into("BOOT-INF/classes/static")
+        }
+    }
+}
+
 tasks.register<Test>("integrationTest") {
     description = "Comprueba migraciones, arranque y concurrencia contra bases efímeras en PostgreSQL."
     group = "verification"

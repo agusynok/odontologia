@@ -26,12 +26,12 @@ La interfaz SHALL consultar `GET /api/odontologo/agenda` con `vista` (`DIA` o `S
 
 ### Requirement: AW-02 Consulta de detalle de turno y cinco datos básicos del paciente
 
-Al seleccionar un turno, SHALL consultar `GET /api/odontologo/turnos/{turnoId}` y mostrar motivo, intervalo en `zonaHoraria`, duración, estado (`CONFIRMADO` o `CANCELADO`), `Revisión` siempre visible (incluido `0`), `creadoEn`, `canceladoEn` y los cinco datos básicos (`nombre`, `apellido`, `email`, `telefono`, `dni`). SHALL NOT mostrar estado `REPROGRAMADO` ni campos clínicos (`CA-US-006-02`). Ante `404 TURNO_NOT_FOUND`, SHALL informarlo sin romper la agenda.
+Al seleccionar un turno, la interfaz SHALL consultar `GET /api/odontologo/turnos/{turnoId}` y mostrar su detalle y los cinco datos básicos del paciente (`CA-US-006-02`). La `Revisión` SHALL estar siempre visible, incluso cuando vale `0`. La interfaz SHALL NOT mostrar estado `REPROGRAMADO` ni campos clínicos.
 
 #### Scenario: Apertura exitosa de detalle con los cinco datos básicos del paciente
 
 - **WHEN** el odontólogo selecciona un turno de la agenda (incluido un turno recién reservado con `revision: 0`) y `GET /api/odontologo/turnos/{turnoId}` responde `200 OK`
-- **THEN** la interfaz muestra el panel de detalle con `motivoNombre`, intervalo en `zonaHoraria`, `duracionReservadaMinutos`, `estado`, `Revisión` siempre visible (incluido `0`), `creadoEn` y los cinco campos de `paciente` (`nombre`, `apellido`, `email`, `telefono`, `dni`), y permite cerrarlo
+- **THEN** la interfaz muestra `motivoNombre`, intervalo en `zonaHoraria`, `duracionReservadaMinutos`, `estado` (`CONFIRMADO` o `CANCELADO`), `Revisión` (incluido `0`), `creadoEn`, `canceladoEn` cuando corresponde y los cinco campos de `paciente` (`nombre`, `apellido`, `email`, `telefono`, `dni`). El panel se puede cerrar.
 
 #### Scenario: Turno reprogramado o cancelado reflejado fielmente según su estado y metadatos
 

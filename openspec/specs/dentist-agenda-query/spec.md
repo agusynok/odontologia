@@ -1,16 +1,16 @@
 # dentist-agenda-query Specification
 
 ## Purpose
-TBD - created by archiving change consulta-agenda-api. Update Purpose after archive.
+Permitir que el odontólogo autenticado consulte su agenda diaria y semanal en la zona horaria del consultorio y acceda al detalle de los turnos con los cinco datos básicos del paciente. La API de solo lectura permite organizar la atención y contactar al paciente cuando sea necesario.
 
 ## Requirements
 
 ### Requirement: AQ-01 Consulta interna de agenda diaria y semanal en la zona del consultorio
-La API interna SHALL exponer `GET /api/odontologo/agenda` con `vista` opcional (`DIA` por defecto o `SEMANA` lunes a domingo ISO) y `fecha` opcional. Si `fecha` se omite, SHALL usar hoy en `consultorio.zonaHoraria` vía `Clock`; si se envía, SHALL cumplir exactamente `YYYY-MM-DD` (4 dígitos de año, sin offset ni espacios) y ser una fecha de calendario válida. La respuesta `200 OK` SHALL devolver `vista`, `desde`, `hasta`, `zonaHoraria` y `turnos` (`CONFIRMADO` y `CANCELADO`) ordenados por `inicio ASC, id ASC`.
+La API interna SHALL exponer `GET /api/odontologo/agenda` con `vista` (`DIA` por defecto o `SEMANA` de lunes a domingo ISO) y `fecha` opcionales. SHALL interpretar el período en `consultorio.zonaHoraria` y devolver `200 OK` con `vista`, `desde`, `hasta`, `zonaHoraria` y `turnos` ordenados por `inicio ASC, id ASC`.
 
 #### Scenario: Consulta diaria y semanal interpretada en la zona horaria del consultorio
-- **WHEN** el odontólogo autenticado consulta `GET /api/odontologo/agenda` con `vista=DIA` o `vista=SEMANA` y una `fecha` `YYYY-MM-DD` válida como `2026-11-26` (o la omite para usar `Clock` en `consultorio.zonaHoraria`)
-- **THEN** la API interpreta los límites de medianoche local en `consultorio.zonaHoraria`, incluye los turnos cuya duración intersecta `[periodoInicio, periodoFin)` y excluye turnos contiguos donde `fin == periodoInicio` o `inicio == periodoFin`.
+- **WHEN** el odontólogo autenticado consulta `GET /api/odontologo/agenda` con `vista=DIA` o `vista=SEMANA` (u omite `vista`) y envía una `fecha` de calendario válida con formato exacto `YYYY-MM-DD`, con año de cuatro dígitos y sin offset ni espacios, o deja `fecha` sin enviar
+- **THEN** la API usa `DIA` si se omitió `vista` y obtiene el día actual de `Clock` en `consultorio.zonaHoraria` si se omitió `fecha`. Interpreta los límites de medianoche en esa zona, incluye los turnos cuya duración intersecta `[periodoInicio, periodoFin)` y excluye turnos contiguos donde `fin == periodoInicio` o `inicio == periodoFin`.
 
 #### Scenario: Inclusión de turnos confirmados y cancelados sin borrado físico
 - **WHEN** en el período consultado existen turnos en estado `CONFIRMADO` y `CANCELADO`
@@ -25,11 +25,11 @@ La API interna SHALL exponer `GET /api/odontologo/agenda` con `vista` opcional (
 - **THEN** la API responde `400` con `{"codigo":"VALIDATION_ERROR"}` antes de invocar al servicio.
 
 ### Requirement: AQ-02 Consulta de detalle de turno y cinco datos básicos del paciente
-La API interna SHALL exponer `GET /api/odontologo/turnos/{turnoId}` exigiendo que `{turnoId}` tenga formato UUID hexadecimal estricto `8-4-4-4-12` (aceptando mayúsculas y minúsculas), devolviendo `200 OK` con `id`, `motivoId`, `motivoNombre`, `inicio`, `fin`, `duracionReservadaMinutos`, `estado`, `revision`, `creadoEn`, `canceladoEn` y `paciente` (`nombre`, `apellido`, `email`, `telefono`, `dni`). SHALL NOT exponer credenciales, notificaciones, `agendaId`, `consultorioId`, historia clínica ni cobros.
+La API interna SHALL devolver el detalle de un turno y los cinco datos básicos del paciente en `GET /api/odontologo/turnos/{turnoId}`. El identificador SHALL ser un UUID hexadecimal estricto `8-4-4-4-12`, en mayúsculas o minúsculas. La respuesta SHALL NOT exponer credenciales, notificaciones, `agendaId`, `consultorioId`, historia clínica ni cobros.
 
 #### Scenario: Consulta exitosa de detalle con los cinco datos básicos del paciente
 - **WHEN** el odontólogo autenticado consulta `GET /api/odontologo/turnos/{turnoId}` con un UUID `8-4-4-4-12` (en mayúsculas o minúsculas) de un turno existente (`CONFIRMADO` o `CANCELADO`)
-- **THEN** la API responde `200 OK` con los datos del turno, su motivo, `revision`, `creadoEn`, `canceladoEn` y `paciente` (`nombre`, `apellido`, `email`, `telefono`, `dni`), sin exponer credenciales, notificaciones ni campos clínicos.
+- **THEN** la API responde `200 OK` con `id`, `motivoId`, `motivoNombre`, `inicio`, `fin`, `duracionReservadaMinutos`, `estado`, `revision`, `creadoEn`, `canceladoEn` y `paciente` (`nombre`, `apellido`, `email`, `telefono`, `dni`).
 
 #### Scenario: Turno inexistente o identificador con formato inválido
 - **WHEN** `{turnoId}` es un UUID `8-4-4-4-12` válido inexistente en la agenda única
